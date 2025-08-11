@@ -33,3 +33,7 @@ if exist "%ProgramFiles%\Elgato\StreamDeck\StreamDeck.exe" (
 )
 
 echo Done.
+
+:eof
+endlocal
+exit /b 0
