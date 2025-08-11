@@ -13,8 +13,8 @@ namespace ImeIndicator.Actions
         private string lastTitle = string.Empty;
 
         private int lastState = -1;
-        private const int STATE_A = 0;
-        private const int STATE_JA = 1;
+        // private const int STATE_A = 0;
+        // private const int STATE_JA = 1;
 
         public ImeIndicatorAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
         {
@@ -46,21 +46,51 @@ namespace ImeIndicator.Actions
                 await Connection.SetTitleAsync(""); // 文字は消して画像だけに
             }
         }
+        // 追加: Win32宣言
+        [DllImport("imm32.dll")] static extern IntPtr ImmGetDefaultIMEWnd(IntPtr hWnd);
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        static extern IntPtr SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+
+        const int WM_IME_CONTROL = 0x0283;
+        const int IMC_GETOPENSTATUS = 0x0005;
+        const int IMC_GETCONVERSIONMODE = 0x0001;
+
+        const int IME_CMODE_NATIVE = 0x0001;   // かな/漢字（日本語）
+        const int STATE_A = 0;
+        const int STATE_JA = 1;
+
         private int GetImeState()
         {
             var hwnd = GetForegroundWindow();
             if (hwnd == IntPtr.Zero) return lastState;
 
+            // ① まず従来のIMM32
             IntPtr hImc = ImmGetContext(hwnd);
-            if (hImc == IntPtr.Zero) return lastState;
+            if (hImc != IntPtr.Zero)
+            {
+                bool open = ImmGetOpenStatus(hImc);
+                int conv = 0, sent = 0;
+                ImmGetConversionStatus(hImc, out conv, out sent);
+                ImmReleaseContext(hwnd, hImc);
 
-            bool open = ImmGetOpenStatus(hImc);
-            int conv = 0, sent = 0;
-            ImmGetConversionStatus(hImc, out conv, out sent);
-            ImmReleaseContext(hwnd, hImc);
+                if (!open) return STATE_A;
+                if ((conv & IME_CMODE_NATIVE) != 0) return STATE_JA;
+                return STATE_A;
+            }
 
-            if (!open) return STATE_A;
-            return (conv & IME_CMODE_NATIVE) != 0 ? STATE_JA : STATE_A;
+            // ② フォールバック：デフォルトIMEウィンドウに WM_IME_CONTROL
+            IntPtr imeWnd = ImmGetDefaultIMEWnd(hwnd);
+            if (imeWnd != IntPtr.Zero)
+            {
+                int open = (int)SendMessage(imeWnd, WM_IME_CONTROL, IMC_GETOPENSTATUS, 0);
+                int conv = (int)SendMessage(imeWnd, WM_IME_CONTROL, IMC_GETCONVERSIONMODE, 0);
+                if (open == 0) return STATE_A;
+                if ((conv & IME_CMODE_NATIVE) != 0) return STATE_JA;
+                return STATE_A;
+            }
+
+            // ③ どうしても読めない時は前回値を維持
+            return lastState;
         }
 
         private string GetImeTitleSafe()
@@ -129,7 +159,7 @@ namespace ImeIndicator.Actions
             throw new NotImplementedException();
         }
 
-        private const int IME_CMODE_NATIVE = 0x0001;       // かな/漢字（ネイティブ）
+        // private const int IME_CMODE_NATIVE = 0x0001;       // かな/漢字（ネイティブ）
         private const int IME_CMODE_KATAKANA = 0x0002;     // カタカナ
         private const int IME_CMODE_FULLSHAPE = 0x0008;    // 全角
         #endregion
