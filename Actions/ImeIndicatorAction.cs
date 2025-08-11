@@ -13,8 +13,6 @@ namespace ImeIndicator.Actions
         private string lastTitle = string.Empty;
 
         private int lastState = -1;
-        // private const int STATE_A = 0;
-        // private const int STATE_JA = 1;
 
         public ImeIndicatorAction(SDConnection connection, InitialPayload payload) : base(connection, payload)
         {
@@ -55,7 +53,9 @@ namespace ImeIndicator.Actions
         const int IMC_GETOPENSTATUS = 0x0005;
         const int IMC_GETCONVERSIONMODE = 0x0001;
 
-        const int IME_CMODE_NATIVE = 0x0001;   // かな/漢字（日本語）
+        private const int IME_CMODE_NATIVE = 0x0001;       // かな/漢字（ネイティブ）
+        private const int IME_CMODE_KATAKANA = 0x0002;     // カタカナ
+        private const int IME_CMODE_FULLSHAPE = 0x0008;    // 全角
         const int STATE_A = 0;
         const int STATE_JA = 1;
 
@@ -159,9 +159,6 @@ namespace ImeIndicator.Actions
             throw new NotImplementedException();
         }
 
-        // private const int IME_CMODE_NATIVE = 0x0001;       // かな/漢字（ネイティブ）
-        private const int IME_CMODE_KATAKANA = 0x0002;     // カタカナ
-        private const int IME_CMODE_FULLSHAPE = 0x0008;    // 全角
         #endregion
     }
 }
