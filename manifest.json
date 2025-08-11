@@ -1,18 +1,14 @@
 {
   "Actions": [
     {
-      "Icon": "images/icon",
+      "Icon": "images/imeindicator_ja",
       "Name": "IME Indicator",
       "States": [
         {
-          "Image": "images/imeindicator_en",
-          "TitleAlignment": "middle",
-          "FontSize": "18"
+          "Image": "images/imeindicator_en"
         },
         {
-          "Image": "images/imeindicator_ja",
-          "TitleAlignment": "middle",
-          "FontSize": "18"
+          "Image": "images/imeindicator_ja"
         }
       ],
       "SupportedInMultiActions": true,
@@ -21,13 +17,14 @@
     }
   ],
   "Author": "dodo",
-  "Category": "Utilities",
-  "CategoryIcon": "images/icon",
+  "Category": "IME Indicator (A/あ)",
+  "CategoryIcon": "images/imeindicator_ja",
   "CodePathWin": "net8.0-windows/ImeIndicator.exe",
+  "CodePath": "net8.0-windows/ImeIndicator.exe",
   "Description": "Displays current input mode: A (IME off / alnum) or あ (IME native)",
   "Name": "IME Indicator (A/あ)",
-  "Icon": "images/icon",
-  "URL": "",
+  "Icon": "images/imeindicator_ja",
+  "URL": "https://github.com/dododoshirouto/IME-Indicator",
   "Version": "1.0.0",
   "OS": [
     {
@@ -38,6 +35,6 @@
   "SDKVersion": 2,
   "UUID": "site.dodoneko.imeindicator",
   "Software": {
-    "MinimumVersion": "6.0"
+    "MinimumVersion": "6.4"
   }
 }
